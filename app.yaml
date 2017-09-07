@@ -1,0 +1,25 @@
+runtime: php
+env: flex
+
+runtime_config:
+  document_root: public
+
+# Ensure we skip ".env", which is only for local development
+skip_files:
+  - .env
+
+env_variables:
+  # Put production environment variables here.
+  APP_NAME: Davicompras
+  APP_ENV: local
+  APP_KEY: base64:id2tHsm/4tSUKIg7ql1YQhRSf8QOq+J7ACy9vUai8Z8=
+  APP_DEBUG: true
+  APP_LOG_LEVEL: debug
+  APP_URL: http://davicompras.dev
+
+  TOKEN_IV: 8681BA2F80658B339ACE9F2BF602F9C8
+  TOKEN_KEY: DEF34B98AA0CD80ED2CCF47AAB97027D0D4186B74744D326342E489EBB0A3A79
+
+  # Firebase Credentials
+  FIREBASE_JSON_KEY_PATH: "keys/davicompras-dev-82e23ee59e9f.json"
+  FIREBASE_URI: "https://davicompras-dev.firebaseio.com"
