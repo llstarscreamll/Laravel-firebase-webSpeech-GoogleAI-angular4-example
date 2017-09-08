@@ -22,10 +22,12 @@ Route::post('/decrypt', 'AuthController@login');
 
 Route::post('/ai', function(Request $request) {
 
+	$data = $request->all();
+	$speech = "Tu producto: ".$data['result']['resolvedQuery'];
 
     return [
-    'speech' => "El producto {$request->result['resolvedQuery']} fue encontrado...",
-    'displayText' => "El producto {$request->result[resolvedQuery]} fue encontrado...",
+    'speech' => $speech,
+    'displayText' => $speech,
     ];
 });
 
