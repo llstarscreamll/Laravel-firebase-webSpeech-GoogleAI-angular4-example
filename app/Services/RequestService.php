@@ -7,19 +7,25 @@ namespace App\Services;
 */
 class RequestService
 {
+	private $node = 'speech_requests';
 	
 	public function __construct(FirebaseService $firebaseService)
 	{
 		$this->database = $firebaseService->database;
 	}
 
-	public function searchRequestByName(string $name)
+	public function createByName(string $name) {
+		return $this->database
+			->getReference($this->node)
+			->push([ 'name' => $name ]);
+	}
+
+	public function searchByName(string $name)
 	{
-		return $this->database->getReference('people')
-		    // order the reference's children by the values in the field 'height'
-		    ->orderByChild('name')
+		return $this->database->getReference($this->node)
+			->orderByChild('name')
 		    // returns all persons taller than or exactly 1.68 (meters)
 		    ->startAt($name)
-		    ->getSnapshot();
+		    ->getValue();
 	}
 }

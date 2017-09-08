@@ -30,8 +30,8 @@ Route::post('/ai', function(Request $request) {
 	if ($intent === "nombre-solicitud") {
 		$requestService = app(RequestService::class);
 		$requestedName = $data['result']['resolvedQuery'];
-		$requests = $requestService->searchRequestByName($requestedName);
-		$speech = json_encode($requests);
+		$speechRequests = $requestService->createByName($requestedName);
+		$speech = 'Tu solicitud creada, dime qué artículo añadir:'.$speechRequests->getKey();
 	}
 
     return [
