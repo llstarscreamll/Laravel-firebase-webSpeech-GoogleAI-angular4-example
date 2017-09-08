@@ -21,10 +21,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::post('/decrypt', 'AuthController@login');
 
 Route::post('/ai', function(Request $request) {
+
+
     return [
-    'speech' => 'Respueta de ejemplo',
-    'displayText' => 'Respueta de ejemplo, displayText',
-    'request' => $request->all(),
+    'speech' => "El producto {$request->result['resolvedQuery']} fue encontrado...",
+    'displayText' => "El producto {$request->result[resolvedQuery]} fue encontrado...",
     ];
 });
 
