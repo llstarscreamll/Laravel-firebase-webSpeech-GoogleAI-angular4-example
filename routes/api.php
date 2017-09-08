@@ -28,16 +28,23 @@ Route::post('/ai', function(Request $request) {
 	$speech = "Opps!! Algo ha salido mal..";
 
 	if ($intent === "nombre-solicitud") {
-		$requestService = app(RequestService::class);
 		$requestedName = $data['result']['resolvedQuery'];
+
+		$requestService = app(RequestService::class);
 		$speechRequests = $requestService->createByName($requestedName);
+		
 		$speech = 'Tu solicitud creada, dime qué artículo añadir:'.$speechRequests->getKey();
+
+		return [
+		    'speech' => $speech,
+		    'displayText' => $speech,
+		];
 	}
 
-    return [
-    'speech' => $speech,
-    'displayText' => $speech,
-    ];
+	return [
+		'speech' => "Parece que ha ocurrido un error",
+		'displayText' => "Parece que ha ocurrido un error",
+	];
 });
 
 // endpoint enabled for non production environments
