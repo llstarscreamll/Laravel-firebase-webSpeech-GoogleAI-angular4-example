@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Services\RequestService;
 use App\Services\FirebaseService;
 
 /*
@@ -23,7 +24,15 @@ Route::post('/decrypt', 'AuthController@login');
 Route::post('/ai', function(Request $request) {
 
 	$data = $request->all();
-	$speech = "Tu producto: ".$data['result']['resolvedQuery'];
+	$intent = $data['result']['metadata']['intentName'];
+	$speech = "Opps!! Algo ha salido mal..";
+
+	if ($intent === "nombre-solicitud") {
+		$requestService = app(RequestService::class);
+		$requestedName = $data['result']['resolvedQuery'];
+		$requests = $requestService->searchRequestByName($requestedName);
+		$speech = json_encode($requests);
+	}
 
     return [
     'speech' => $speech,
