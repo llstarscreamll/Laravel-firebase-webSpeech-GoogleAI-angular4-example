@@ -31,6 +31,7 @@ Route::post('/ai', function(Request $request) {
 	$msg = $data['result']['resolvedQuery'];
 	$speech = "Opps!! Algo ha salido mal..";
 	$data = [];
+	$contextOut = [];
 
 	switch ($action) {
 
@@ -51,6 +52,11 @@ Route::post('/ai', function(Request $request) {
 			$newRequest = $requestService->createByName($name);
 			$speech = "qué artículos añado a solicitud \"$name\"?";
 			$data['request_id'] = $newRequest->getKey();
+			$contextOut[] = [
+				'name' => $intent,
+				'lifespan' => 5,
+				'parameters' => [ 'request_id' => $newRequest->getKey() ]
+			];
 			break;
 		
 		default:
@@ -62,7 +68,8 @@ Route::post('/ai', function(Request $request) {
 	return [
 		'speech' => $speech,
 		'displayText' => $speech,
-		'data' => $data
+		'data' => $data,
+		'contextOut' => $contextOut
 	];
 });
 

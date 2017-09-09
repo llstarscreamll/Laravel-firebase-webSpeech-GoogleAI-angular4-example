@@ -44,6 +44,9 @@ class AiCest
         $I->seeResponseJsonMatchesJsonPath('$.speech');
         $I->seeResponseJsonMatchesJsonPath('$.displayText');
         $I->seeResponseJsonMatchesJsonPath('$.data.request_id');
+        $I->seeResponseJsonMatchesJsonPath('$.contextOut[0].name');
+        $I->seeResponseJsonMatchesJsonPath('$.contextOut[0].lifespan');
+        $I->seeResponseJsonMatchesJsonPath('$.contextOut[0].parameters.request_id');
     }
 /*
     public function onlySuggestItemsByNameMatchs(ApiTester $I)
