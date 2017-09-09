@@ -35,7 +35,13 @@ class ItemsService
 		// poorly results from that Firebase shit 
 		return $data
 			? array_where($data, function ($value, $key) use ($name) {
-				return str_contains($value['name'], $name);
+
+				if (strtolower($value['name']) === strtolower($name)) {
+					return true;
+				} else {
+					return str_contains(strtolower($value['name']), strtolower($name));
+				}
+
 			})
 			: [];
 	}

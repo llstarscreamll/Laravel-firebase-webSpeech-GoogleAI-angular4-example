@@ -47,11 +47,13 @@ Route::post('/ai', function(Request $request) {
 			
 			if (count($itemsFound) === 0) {
 				$speech = "No encontré coincidencias del artículo $itemName";
+				$requestService->cleanSuggestions($requestId);
 			}
 
 			if (count($itemsFound) === 1) {
 				$speech = "He añadido $itemQuantity $itemName, algo mas?";
 				$requestService->addItemToRequest($requestId, $itemsFound, $itemQuantity);
+				$requestService->cleanSuggestions($requestId);
 			}
 
 			if (($count = count($itemsFound)) > 1) {

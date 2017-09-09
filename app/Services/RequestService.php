@@ -52,6 +52,12 @@ class RequestService
 			->push(['item' => $items, 'quantity' => $quantity ]);
 	}
 
+	public function cleanSuggestions(string $requestId) {
+		$this->database
+			->getReference($this->node.'/'.$requestId.'/suggestions')
+			->remove();
+	}
+
 	public function deleteById($id)
 	{
 		$this->database->getReference($this->node.'/'.$id)->remove();
