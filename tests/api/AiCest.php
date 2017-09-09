@@ -70,7 +70,7 @@ class AiCest
 
         $I->seeResponseCodeIs(200);
         $I->seeResponseContainsJson([
-            'speech' => 'qué artículos añado a solicitud "compra de tablets"?',
+            'speech' => '¿Qué artículos añado a solicitud "compra de tablets"?',
         ]);
         $I->seeResponseJsonMatchesJsonPath('$.speech');
         $I->seeResponseJsonMatchesJsonPath('$.displayText');
@@ -103,9 +103,9 @@ class AiCest
         ]);
 
         $I->seeResponseCodeIs(200);
-        $I->seeResponseContainsJson(['speech' => "He añadido 4 licencias de software, algo mas?"]);
-        $this->itemsService->deleteById($itemOne->getKey());
-        $this->itemsService->deleteById($itemTwo->getKey());
+        $I->seeResponseContainsJson(['speech' => "He añadido 4 licencias de software. ¿Algo mas?"]);
+        // $this->itemsService->deleteById($itemOne->getKey());
+        // $this->itemsService->deleteById($itemTwo->getKey());
     }
 
     public function addItemsSuggestionsToGivenSpeechRequest(ApiTester $I)
@@ -132,9 +132,9 @@ class AiCest
         ]);
 
         $I->seeResponseCodeIs(200);
-        $I->seeResponseContainsJson(['speech' => "He encontrado {$items} coincidencias de foo item, por favor sé mas específico..."]);
-        $this->itemsService->deleteById($item->getKey());
-        $this->itemsService->deleteById($item2->getKey());
+        $I->seeResponseContainsJson(['speech' => "He encontrado {$items} coincidencias de foo item. Por favor sé mas específico..."]);
+        // $this->itemsService->deleteById($item->getKey());
+        // $this->itemsService->deleteById($item2->getKey());
     }
 
     public function handleNonFoundSuggestionsToSpeechRequest(ApiTester $I)

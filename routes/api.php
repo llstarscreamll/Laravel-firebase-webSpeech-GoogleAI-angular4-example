@@ -51,13 +51,13 @@ Route::post('/ai', function(Request $request) {
 			}
 
 			if (count($itemsFound) === 1) {
-				$speech = "He añadido $itemQuantity $itemName, algo mas?";
+				$speech = "He añadido $itemQuantity $itemName. ¿Algo mas?";
 				$requestService->addItemToRequest($requestId, $itemsFound, $itemQuantity);
 				$requestService->cleanSuggestions($requestId);
 			}
 
 			if (($count = count($itemsFound)) > 1) {
-				$speech = "He encontrado {$count} coincidencias de $itemName, por favor sé mas específico...";
+				$speech = "He encontrado {$count} coincidencias de $itemName. Por favor sé mas específico...";
 				$requestService->addItemsSuggestionsToRequest($requestId, $itemName);
 			}
 
@@ -66,7 +66,7 @@ Route::post('/ai', function(Request $request) {
 		case 'action.create-request':
 			$name = $parameters['request-name'];
 			$newRequest = $requestService->createByName($name);
-			$speech = "qué artículos añado a solicitud \"$name\"?";
+			$speech = "¿Qué artículos añado a solicitud \"$name\"?";
 			$data['request_id'] = $newRequest->getKey();
 			$contextOut[] = [
 				'name' => $intent,
