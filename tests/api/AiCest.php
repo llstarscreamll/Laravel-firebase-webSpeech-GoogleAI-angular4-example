@@ -25,6 +25,34 @@ class AiCest
         $this->itemsService->deleteAll();
     }
 
+    public function fixItemsSuggestionCollision(ApiTester $I)
+    {
+        $speechRequestName = 'speech request testing';
+        $speechRequest = $this->requestService->createByName($speechRequestName);
+        $itemOne = $this->itemsService->createByName('computador');
+        $itemTwo = $this->itemsService->createByName('computador Toshiba');
+
+        $I->sendPost('api/ai', [
+            'result' => [
+                'resolvedQuery' => 'agregar 4 computador',
+                'action' => 'action.add-item-to-request',
+                'parameters' => [
+                    "item-name" => "computador",
+                    "item-quantity" => "4",
+                    "request_id" => "-Ktb5o3-3Ss5_2jGSAiE",
+                ],
+                'metadata' => [
+                  'intentName' => 'agregar-articulo',
+                ]
+            ],
+        ]);
+
+        $I->seeResponseCodeIs(200);
+        $I->seeResponseContainsJson(['speech' => "He añadido 4 computador, algo mas?"]);
+        // $this->itemsService->deleteById($itemOne->getKey());
+        // $this->itemsService->deleteById($itemTwo->getKey());
+    }
+
     public function createSpeechRequestWithGivenName(ApiTester $I)
     {
         $I->sendPost('api/ai', [

@@ -32,18 +32,20 @@ class ItemsService
 
 		// that stupid fucking Firebase database returns unuseful
 		// data with the desired results... let's clean those
-		// poorly results from that Firebase shit 
-		return $data
-			? array_where($data, function ($value, $key) use ($name) {
+		// poorly results from that Firebase shit
+		if (count($data) > 0) {
+			$exactMatch = array_where($data, function ($value, $key) use ($name) {
+				return strtolower($value['name']) === strtolower($name);
+			});
 
-				if (strtolower($value['name']) === strtolower($name)) {
-					return true;
-				} else {
+			return $exactMatch
+				? $exactMatch
+				: array_where($data, function ($value, $key) use ($name) {
 					return str_contains(strtolower($value['name']), strtolower($name));
-				}
+				});
+		}
 
-			})
-			: [];
+		return [];
 	}
 
 	public function deleteById($id)
