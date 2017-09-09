@@ -45,6 +45,13 @@ class RequestService
 		return $items;
 	}
 
+	public function addItemToRequest(string $requestId, array $items, int $quantity)
+	{
+		$this->database
+			->getReference($this->node.'/'.$requestId.'/items')
+			->push(['item' => $items, 'quantity' => $quantity ]);
+	}
+
 	public function deleteById($id)
 	{
 		$this->database->getReference($this->node.'/'.$id)->remove();

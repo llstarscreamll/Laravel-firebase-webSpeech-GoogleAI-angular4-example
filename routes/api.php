@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Services\ItemsService;
 use App\Services\RequestService;
 use App\Services\FirebaseService;
 
@@ -25,6 +26,7 @@ Route::post('/ai', function(Request $request) {
 
 	$data = $request->all();
 	$requestService = app(RequestService::class);
+	$itemsService = app(ItemsService::class);
 	$intent = $data['result']['metadata']['intentName'];
 	$action = $data['result']['action'];
 	$parameters = $data['result']['parameters'];
@@ -35,16 +37,28 @@ Route::post('/ai', function(Request $request) {
 
 	switch ($action) {
 
-		case 'buscar-articulo':
+		case 'action.add-item-to-request':
 			// the speech request id should be appended on the msg
-			$speechRequestId = explode(':', $msg)[1];
-			$itemName = explode(':', $msg)[0];
-			// add items sugestions based on the given $msg
-			$itemsSuggested = $requestService->addItemsSuggestionsToRequest($speechRequestId, $itemName);
-			// set response msg
-			$speech = ($itemsCount = count($itemsSuggested)) > 0
-				? "Se encontraron $itemsCount artículos, cual eliges?"
-				: "No se encontraron sugerencias...";
+			$requestId = $parameters['request_id'];
+			$itemName = $parameters['item-name'];
+			$itemQuantity = $parameters['item-quantity'];
+			// search for items by the given name
+			$itemsFound = $itemsService->searchByName($itemName);
+			
+			if (count($itemsFound) === 0) {
+				$speech = "No encontré coincidencias del artículo $itemName";
+			}
+
+			if (count($itemsFound) === 1) {
+				$speech = "He añadido $itemQuantity $itemName, algo mas?";
+				$requestService->addItemToRequest($requestId, $itemsFound, $itemQuantity);
+			}
+
+			if (($count = count($itemsFound)) > 1) {
+				$speech = "He encontrado {$count} coincidencias de $itemName, por favor sé mas específico...";
+				$requestService->addItemsSuggestionsToRequest($requestId, $itemName);
+			}
+
 			break;
 
 		case 'action.create-request':

@@ -14,11 +14,15 @@ class AiCest
     {
         $this->itemsService = app(ItemsService::class);
         $this->requestService = app(RequestService::class);
+        
+        $this->requestService->deleteAll();
+        $this->itemsService->deleteAll();
     }
 
     public function _after(ApiTester $I)
     {
         $this->requestService->deleteAll();
+        $this->itemsService->deleteAll();
     }
 
     public function createSpeechRequestWithGivenName(ApiTester $I)
@@ -27,7 +31,6 @@ class AiCest
             'result' => [
                 'resolvedQuery' => 'crear solicitud compra de tablets',
                 'action' => 'action.create-request',
-                'actionIncomplete' => false,
                 "parameters" => [
                     "request-name" => "compra de tablets"
                 ],
@@ -48,26 +51,31 @@ class AiCest
         $I->seeResponseJsonMatchesJsonPath('$.contextOut[0].lifespan');
         $I->seeResponseJsonMatchesJsonPath('$.contextOut[0].parameters.request_id');
     }
-/*
-    public function onlySuggestItemsByNameMatchs(ApiTester $I)
+
+    public function onlySuggestItemsByMatchedNames(ApiTester $I)
     {
         $speechRequestName = 'speech request testing';
         $speechRequest = $this->requestService->createByName($speechRequestName);
         $itemOne = $this->itemsService->createByName('xx bar xx');
-        $itemTwo = $this->itemsService->createByName('foo item 1');
+        $itemTwo = $this->itemsService->createByName('licencias de software IBM');
 
         $I->sendPost('api/ai', [
             'result' => [
-                'resolvedQuery' => 'xx bar:'.$speechRequest->getKey(),
-                'parameters' => [],
+                'resolvedQuery' => 'agregar 4 licencias de software',
+                'action' => 'action.add-item-to-request',
+                'parameters' => [
+                    "item-name" => "licencias de software",
+                    "item-quantity" => "4",
+                    "request_id" => "-Ktb5o3-3Ss5_2jGSAiE",
+                ],
                 'metadata' => [
-                  'intentName' => 'buscar-articulo',
+                  'intentName' => 'agregar-articulo',
                 ]
             ],
         ]);
 
         $I->seeResponseCodeIs(200);
-        $I->seeResponseContainsJson(['speech' => "Se encontraron 1 artículos, cual eliges?"]);
+        $I->seeResponseContainsJson(['speech' => "He añadido 4 licencias de software, algo mas?"]);
         $this->itemsService->deleteById($itemOne->getKey());
         $this->itemsService->deleteById($itemTwo->getKey());
     }
@@ -77,21 +85,28 @@ class AiCest
         $speechRequestName = 'speech request testing';
         $speechRequest = $this->requestService->createByName($speechRequestName);
         $item = $this->itemsService->createByName('foo item 1');
-        $items = count($this->itemsService->searchByName('foo item 1'));
+        $item2 = $this->itemsService->createByName('foo item 2');
+        $items = count($this->itemsService->searchByName('foo item'));
 
         $I->sendPost('api/ai', [
             'result' => [
-                'resolvedQuery' => 'foo item 1:'.$speechRequest->getKey(),
-                'parameters' => [],
+                'resolvedQuery' => 'agregar 4 foo item',
+                'action' => 'action.add-item-to-request',
+                'parameters' => [
+                    "item-name" => "foo item",
+                    "item-quantity" => "4",
+                    "request_id" => "-Ktb5o3-3Ss5_2jGSAiE",
+                ],
                 'metadata' => [
-                  'intentName' => 'buscar-articulo',
+                  'intentName' => 'agregar-articulo',
                 ]
             ],
         ]);
 
         $I->seeResponseCodeIs(200);
-        $I->seeResponseContainsJson(['speech' => "Se encontraron $items artículos, cual eliges?"]);
+        $I->seeResponseContainsJson(['speech' => "He encontrado {$items} coincidencias de foo item, por favor sé mas específico..."]);
         $this->itemsService->deleteById($item->getKey());
+        $this->itemsService->deleteById($item2->getKey());
     }
 
     public function handleNonFoundSuggestionsToSpeechRequest(ApiTester $I)
@@ -101,16 +116,21 @@ class AiCest
 
         $I->sendPost('api/ai', [
             'result' => [
-                'resolvedQuery' => 'xx bla bla bla xx:'.$speechRequest->getKey(),
-                'parameters' => [],
+                'resolvedQuery' => 'agregar 4 foo item',
+                'action' => 'action.add-item-to-request',
+                'parameters' => [
+                    "item-name" => "foo item",
+                    "item-quantity" => "4",
+                    "request_id" => "-Ktb5o3-3Ss5_2jGSAiE",
+                ],
                 'metadata' => [
-                  'intentName' => 'buscar-articulo',
+                  'intentName' => 'agregar-articulo',
                 ]
             ],
         ]);
 
         $I->seeResponseCodeIs(200);
-        $I->seeResponseContainsJson(['speech' => "No se encontraron sugerencias..."]);
+        $I->seeResponseContainsJson(['speech' => "No encontré coincidencias del artículo foo item"]);
     }
-*/
+
 }
