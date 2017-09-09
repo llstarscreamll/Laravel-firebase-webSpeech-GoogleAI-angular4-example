@@ -25,18 +25,48 @@ class AiCest
     {
         $I->sendPost('api/ai', [
             'result' => [
-                'resolvedQuery' => 'compra de tablets para dpto calidad',
-                'action' => 'action.request-name',
+                'resolvedQuery' => 'crear solicitud compra de tablets',
+                'action' => 'action.create-request',
                 'actionIncomplete' => false,
-                'parameters' => [],
+                "parameters" => [
+                    "request-name" => "compra de tablets"
+                ],
                 'metadata' => [
-                  'intentName' => 'nombre-solicitud'
+                  'intentName' => 'crear-solicitud'
                 ]
             ],
         ]);
 
         $I->seeResponseCodeIs(200);
-        // TODO: add json path matches
+        $I->seeResponseContainsJson([
+            'speech' => 'qué artículos añado a solicitud "compra de tablets"?',
+        ]);
+        $I->seeResponseJsonMatchesJsonPath('$.speech');
+        $I->seeResponseJsonMatchesJsonPath('$.displayText');
+        $I->seeResponseJsonMatchesJsonPath('$.data.request_id');
+    }
+/*
+    public function onlySuggestItemsByNameMatchs(ApiTester $I)
+    {
+        $speechRequestName = 'speech request testing';
+        $speechRequest = $this->requestService->createByName($speechRequestName);
+        $itemOne = $this->itemsService->createByName('xx bar xx');
+        $itemTwo = $this->itemsService->createByName('foo item 1');
+
+        $I->sendPost('api/ai', [
+            'result' => [
+                'resolvedQuery' => 'xx bar:'.$speechRequest->getKey(),
+                'parameters' => [],
+                'metadata' => [
+                  'intentName' => 'buscar-articulo',
+                ]
+            ],
+        ]);
+
+        $I->seeResponseCodeIs(200);
+        $I->seeResponseContainsJson(['speech' => "Se encontraron 1 artículos, cual eliges?"]);
+        $this->itemsService->deleteById($itemOne->getKey());
+        $this->itemsService->deleteById($itemTwo->getKey());
     }
 
     public function addItemsSuggestionsToGivenSpeechRequest(ApiTester $I)
@@ -58,6 +88,7 @@ class AiCest
 
         $I->seeResponseCodeIs(200);
         $I->seeResponseContainsJson(['speech' => "Se encontraron $items artículos, cual eliges?"]);
+        $this->itemsService->deleteById($item->getKey());
     }
 
     public function handleNonFoundSuggestionsToSpeechRequest(ApiTester $I)
@@ -78,4 +109,5 @@ class AiCest
         $I->seeResponseCodeIs(200);
         $I->seeResponseContainsJson(['speech' => "No se encontraron sugerencias..."]);
     }
+*/
 }

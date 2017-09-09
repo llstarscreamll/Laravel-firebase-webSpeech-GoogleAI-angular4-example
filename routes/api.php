@@ -26,10 +26,13 @@ Route::post('/ai', function(Request $request) {
 	$data = $request->all();
 	$requestService = app(RequestService::class);
 	$intent = $data['result']['metadata']['intentName'];
+	$action = $data['result']['action'];
+	$parameters = $data['result']['parameters'];
 	$msg = $data['result']['resolvedQuery'];
 	$speech = "Opps!! Algo ha salido mal..";
+	$data = [];
 
-	switch ($intent) {
+	switch ($action) {
 
 		case 'buscar-articulo':
 			// the speech request id should be appended on the msg
@@ -43,10 +46,11 @@ Route::post('/ai', function(Request $request) {
 				: "No se encontraron sugerencias...";
 			break;
 
-		case 'nombre-solicitud':
-			$requestedName = $msg;
-			$speechRequests = $requestService->createByName($requestedName);
-			$speech = 'Tu solicitud ha sido creada, dime qué artículo busco para añadir:'.$speechRequests->getKey();
+		case 'action.create-request':
+			$name = $parameters['request-name'];
+			$newRequest = $requestService->createByName($name);
+			$speech = "qué artículos añado a solicitud \"$name\"?";
+			$data['request_id'] = $newRequest->getKey();
 			break;
 		
 		default:
@@ -58,6 +62,7 @@ Route::post('/ai', function(Request $request) {
 	return [
 		'speech' => $speech,
 		'displayText' => $speech,
+		'data' => $data
 	];
 });
 
