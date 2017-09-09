@@ -24,26 +24,40 @@ Route::post('/decrypt', 'AuthController@login');
 Route::post('/ai', function(Request $request) {
 
 	$data = $request->all();
+	$requestService = app(RequestService::class);
 	$intent = $data['result']['metadata']['intentName'];
+	$msg = $data['result']['resolvedQuery'];
 	$speech = "Opps!! Algo ha salido mal..";
 
-	if ($intent === "nombre-solicitud") {
-		$requestedName = $data['result']['resolvedQuery'];
+	switch ($intent) {
 
-		$requestService = app(RequestService::class);
-		$speechRequests = $requestService->createByName($requestedName);
+		case 'buscar-articulo':
+			// the speech request id should be appended on the msg
+			$speechRequestId = explode(':', $msg)[1];
+			$itemName = explode(':', $msg)[0];
+			// add items sugestions based on the given $msg
+			$itemsSuggested = $requestService->addItemsSuggestionsToRequest($speechRequestId, $itemName);
+			// set response msg
+			$speech = ($itemsCount = count($itemsSuggested)) > 0
+				? "Se encontraron $itemsCount artículos, cual eliges?"
+				: "No se encontraron sugerencias...";
+			break;
+
+		case 'nombre-solicitud':
+			$requestedName = $msg;
+			$speechRequests = $requestService->createByName($requestedName);
+			$speech = 'Tu solicitud ha sido creada, dime qué artículo busco para añadir:'.$speechRequests->getKey();
+			break;
 		
-		$speech = 'Tu solicitud creada, dime qué artículo añadir:'.$speechRequests->getKey();
+		default:
+			$speech = 'Parece que ha ocurrido un error en la API';
+			break;
 
-		return [
-		    'speech' => $speech,
-		    'displayText' => $speech,
-		];
 	}
 
 	return [
-		'speech' => "Parece que ha ocurrido un error",
-		'displayText' => "Parece que ha ocurrido un error",
+		'speech' => $speech,
+		'displayText' => $speech,
 	];
 });
 

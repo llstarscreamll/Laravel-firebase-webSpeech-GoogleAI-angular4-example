@@ -3,15 +3,20 @@
 namespace App\Services;
 
 /**
-* RequestService
+* RequestService Class.
+*
+* @author Johan Alvarez <llstarscreamll@hotmail.com>
 */
 class RequestService
 {
 	private $node = 'speech_requests';
 	
-	public function __construct(FirebaseService $firebaseService)
-	{
+	public function __construct(
+		FirebaseService $firebaseService,
+		ItemsService $itemsService
+	) {
 		$this->database = $firebaseService->database;
+		$this->itemsService = $itemsService;
 	}
 
 	public function createByName(string $name) {
@@ -27,5 +32,26 @@ class RequestService
 		    // returns all persons taller than or exactly 1.68 (meters)
 		    ->startAt($name)
 		    ->getValue();
+	}
+
+	public function addItemsSuggestionsToRequest($speechRequestId, $itemName)
+	{
+		// search items based on the given name
+		$items = $this->itemsService->searchByName($itemName);
+		$this->database
+			->getReference($this->node.'/'.$speechRequestId.'/suggestions')
+			->set($items);
+
+		return $items;
+	}
+
+	public function deleteById($id)
+	{
+		$this->database->getReference($this->node.'/'.$id)->remove();
+	}
+
+	public function deleteAll()
+	{
+		$this->database->getReference($this->node)->remove();
 	}
 }

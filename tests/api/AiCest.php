@@ -1,5 +1,8 @@
 <?php
 
+use App\Services\ItemsService;
+use App\Services\RequestService;
+
 /**
  * AiCest Class.
  * 
@@ -7,7 +10,18 @@
  */
 class AiCest
 {
-    public function aiRequestName(ApiTester $I)
+    public function _before(ApiTester $I)
+    {
+        $this->itemsService = app(ItemsService::class);
+        $this->requestService = app(RequestService::class);
+    }
+
+    public function _after(ApiTester $I)
+    {
+        $this->requestService->deleteAll();
+    }
+
+    public function createSpeechRequestWithGivenName(ApiTester $I)
     {
         $I->sendPost('api/ai', [
             'result' => [
@@ -23,6 +37,45 @@ class AiCest
 
         $I->seeResponseCodeIs(200);
         // TODO: add json path matches
-        // $I->seeResponseContainsJson(['speech' => 'He creado tu solicitud']);
+    }
+
+    public function addItemsSuggestionsToGivenSpeechRequest(ApiTester $I)
+    {
+        $speechRequestName = 'speech request testing';
+        $speechRequest = $this->requestService->createByName($speechRequestName);
+        $item = $this->itemsService->createByName('foo item 1');
+        $items = count($this->itemsService->searchByName('foo item 1'));
+
+        $I->sendPost('api/ai', [
+            'result' => [
+                'resolvedQuery' => 'foo item 1:'.$speechRequest->getKey(),
+                'parameters' => [],
+                'metadata' => [
+                  'intentName' => 'buscar-articulo',
+                ]
+            ],
+        ]);
+
+        $I->seeResponseCodeIs(200);
+        $I->seeResponseContainsJson(['speech' => "Se encontraron $items artículos, cual eliges?"]);
+    }
+
+    public function handleNonFoundSuggestionsToSpeechRequest(ApiTester $I)
+    {
+        $speechRequestName = 'speech request testing';
+        $speechRequest = $this->requestService->createByName($speechRequestName);
+
+        $I->sendPost('api/ai', [
+            'result' => [
+                'resolvedQuery' => 'xx bla bla bla xx:'.$speechRequest->getKey(),
+                'parameters' => [],
+                'metadata' => [
+                  'intentName' => 'buscar-articulo',
+                ]
+            ],
+        ]);
+
+        $I->seeResponseCodeIs(200);
+        $I->seeResponseContainsJson(['speech' => "No se encontraron sugerencias..."]);
     }
 }
