@@ -37,6 +37,18 @@ Route::post('/ai', function(Request $request) {
 
 	switch ($action) {
 
+		case 'action.finish-request':
+			$requestId = $parameters['request_id'];
+			$requestService->finish($requestId);
+			$speech = "Solicitud finalizada, ahora está pendiente de aprobación. Eso es todo, fue un gusto ayudarte.";
+			break;
+
+		case 'action.cancel-request':
+			$requestId = $parameters['request_id'];
+			$requestService->cancel($requestId);
+			$speech = "Se ha cancelado tu solicitud. Fue un gusto asistirte.";
+			break;
+
 		case 'action.add-item-to-request':
 			// the speech request id should be appended on the msg
 			$requestId = $parameters['request_id'];

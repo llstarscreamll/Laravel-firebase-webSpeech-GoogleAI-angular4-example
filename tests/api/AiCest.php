@@ -25,6 +25,50 @@ class AiCest
         $this->itemsService->deleteAll();
     }
 
+    public function finishRequest(ApiTester $I)
+    {
+        $speechRequestName = 'speech request testing';
+        $speechRequest = $this->requestService->createByName($speechRequestName);
+
+        $I->sendPost('api/ai', [
+            'result' => [
+                'resolvedQuery' => 'finalizar solicitud',
+                'action' => 'action.finish-request',
+                'parameters' => [
+                    "request_id" => "-Ktb5o3-3Ss5_2jGSAiE",
+                ],
+                'metadata' => [
+                  'intentName' => 'finializar-solicitud',
+                ]
+            ],
+        ]);
+
+        $I->seeResponseCodeIs(200);
+        $I->seeResponseContainsJson(['speech' => "Solicitud finalizada, ahora está pendiente de aprobación. Eso es todo, fue un gusto ayudarte."]);
+    }
+
+    public function cancelRequest(ApiTester $I)
+    {
+        $speechRequestName = 'speech request testing';
+        $speechRequest = $this->requestService->createByName($speechRequestName);
+
+        $I->sendPost('api/ai', [
+            'result' => [
+                'resolvedQuery' => 'cancelar solicitud',
+                'action' => 'action.cancel-request',
+                'parameters' => [
+                    "request_id" => "-Ktb5o3-3Ss5_2jGSAiE",
+                ],
+                'metadata' => [
+                  'intentName' => 'cancelar-solicitud',
+                ]
+            ],
+        ]);
+
+        $I->seeResponseCodeIs(200);
+        $I->seeResponseContainsJson(['speech' => "Se ha cancelado tu solicitud. Fue un gusto asistirte."]);
+    }
+
     public function fixItemsSuggestionCollision(ApiTester $I)
     {
         $speechRequestName = 'speech request testing';
@@ -48,9 +92,7 @@ class AiCest
         ]);
 
         $I->seeResponseCodeIs(200);
-        $I->seeResponseContainsJson(['speech' => "He añadido 4 computador, algo mas?"]);
-        // $this->itemsService->deleteById($itemOne->getKey());
-        // $this->itemsService->deleteById($itemTwo->getKey());
+        $I->seeResponseContainsJson(['speech' => "He añadido 4 computador. ¿Algo mas?"]);
     }
 
     public function createSpeechRequestWithGivenName(ApiTester $I)
@@ -104,8 +146,6 @@ class AiCest
 
         $I->seeResponseCodeIs(200);
         $I->seeResponseContainsJson(['speech' => "He añadido 4 licencias de software. ¿Algo mas?"]);
-        // $this->itemsService->deleteById($itemOne->getKey());
-        // $this->itemsService->deleteById($itemTwo->getKey());
     }
 
     public function addItemsSuggestionsToGivenSpeechRequest(ApiTester $I)

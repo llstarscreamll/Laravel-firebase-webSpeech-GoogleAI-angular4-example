@@ -58,6 +58,20 @@ class RequestService
 			->remove();
 	}
 
+	public function finish(string $id)
+	{
+		$this->database
+			->getReference($this->node.'/'.$id.'/status')
+			->set('finished');
+	}
+
+	public function cancel(string $id)
+	{
+		$this->database
+			->getReference($this->node.'/'.$id.'/status')
+			->set('cenceled');
+	}
+
 	public function deleteById($id)
 	{
 		$this->database->getReference($this->node.'/'.$id)->remove();
