@@ -25,10 +25,12 @@ class AiCest
         $this->itemsService->deleteAll();
     }
 
+/*
     public function approveSpecificRequestFromGivenList(ApiTester $I)
     {
-        $speechRequest1 = $this->requestService->createByName('Foo request 11');
-        $speechRequest2 = $this->requestService->createByName('Foo request 22');
+        $speechRequest1 = $this->requestService->createByName('Foo request 01');
+        $speechRequest2 = $this->requestService->createByName('Foo request 11');
+        $speechRequest3 = $this->requestService->createByName('Foo request 22');
 
         $I->sendPost('api/ai', [
             'result' => [
@@ -48,7 +50,6 @@ class AiCest
         $I->seeResponseContainsJson(['speech' => "La solicitud \"Foo request 22\" fue aprovada correctamente."]);
     }
 
-/*
     public function approveSingleRequestFound(ApiTester $I)
     {
         $speechRequest = $this->requestService->createByName('Foo request');
@@ -88,6 +89,7 @@ class AiCest
         $I->seeResponseCodeIs(200);
         $I->seeResponseContainsJson(['speech' => "No encontré solicitud con ese nombre, intenta otro."]);
     }
+    */
     public function searchRequestsToApprove(ApiTester $I)
     {
         $speechRequest1 = $this->requestService->createByName('Foo 1');
@@ -110,12 +112,12 @@ class AiCest
         $I->seeResponseContainsJson(['speech' => "Encontré 2 coincidencias. ¿Cual deseas aprobar?"]);
         $I->seeResponseContainsJson(['data' => [
             'matches' => [
-                $speechRequest1->getKey() => $speechRequest1->getValue(),
-                $speechRequest2->getKey() => $speechRequest2->getValue(),
+                0 => ['key' => $speechRequest1->getKey()] + $speechRequest1->getValue(),
+                1 => ['key' => $speechRequest2->getKey()] + $speechRequest2->getValue(),
             ],
         ]]);
     }
-
+/*
     public function finishRequest(ApiTester $I)
     {
         $speechRequestName = 'speech request testing';

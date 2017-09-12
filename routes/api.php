@@ -103,7 +103,9 @@ Route::post('/ai', function(Request $request) {
 				
 				default:
 					$speech = "Encontré ". count($requestsFound) . " coincidencias. ¿Cual deseas aprobar?";
-					$data['matches'] = $requestsFound;
+					foreach ($requestsFound as $key => $value) {
+						$data['matches'][] = ['key' => $key] + $value;
+					}
 					break;
 			}
 			break;
