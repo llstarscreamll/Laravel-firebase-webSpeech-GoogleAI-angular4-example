@@ -25,6 +25,69 @@ class AiCest
         $this->itemsService->deleteAll();
     }
 
+    public function approveSpecificRequestFromGivenList(ApiTester $I)
+    {
+        $speechRequest1 = $this->requestService->createByName('Foo request 11');
+        $speechRequest2 = $this->requestService->createByName('Foo request 22');
+
+        $I->sendPost('api/ai', [
+            'result' => [
+                'resolvedQuery' => 'aprobar la segunda',
+                'action' => 'action.select-request-to-approve',
+                'parameters' => [
+                    "request-name" => "Foo request",
+                    "selected" => "2"
+                ],
+                'metadata' => [
+                  'intentName' => 'seleccionar-solicitud-a-aprobar',
+                ]
+            ],
+        ]);
+
+        $I->seeResponseCodeIs(200);
+        $I->seeResponseContainsJson(['speech' => "La solicitud \"Foo request 22\" fue aprovada correctamente."]);
+    }
+
+/*
+    public function approveSingleRequestFound(ApiTester $I)
+    {
+        $speechRequest = $this->requestService->createByName('Foo request');
+
+        $I->sendPost('api/ai', [
+            'result' => [
+                'resolvedQuery' => 'aprobar solicitud Foo',
+                'action' => 'action.approve-request',
+                'parameters' => [
+                    "request-name" => "Foo request",
+                ],
+                'metadata' => [
+                  'intentName' => 'aprobar-solicitud',
+                ]
+            ],
+        ]);
+
+        $I->seeResponseCodeIs(200);
+        $I->seeResponseContainsJson(['speech' => "Solicitud \"Foo request\" aprovada correctamente. Ya no te ayudo mas... Ve y llena los formularios."]);
+    }
+
+    public function handleNotFoundRequestToApprove(ApiTester $I)
+    {
+        $I->sendPost('api/ai', [
+            'result' => [
+                'resolvedQuery' => 'aprobar solicitud Foo',
+                'action' => 'action.approve-request',
+                'parameters' => [
+                    "request-name" => "Foo",
+                ],
+                'metadata' => [
+                  'intentName' => 'aprobar-solicitud',
+                ]
+            ],
+        ]);
+
+        $I->seeResponseCodeIs(200);
+        $I->seeResponseContainsJson(['speech' => "No encontré solicitud con ese nombre, intenta otro."]);
+    }
     public function searchRequestsToApprove(ApiTester $I)
     {
         $speechRequest1 = $this->requestService->createByName('Foo 1');
@@ -52,7 +115,7 @@ class AiCest
             ],
         ]]);
     }
-/*
+
     public function finishRequest(ApiTester $I)
     {
         $speechRequestName = 'speech request testing';
@@ -72,7 +135,7 @@ class AiCest
         ]);
 
         $I->seeResponseCodeIs(200);
-        $I->seeResponseContainsJson(['speech' => "Solicitud finalizada, ahora está pendiente de aprobación. Eso es todo, fue un gusto ayudarte."]);
+        $I->seeResponseContainsJson(['speech' => "Solicitud finalizada, ahora está pendiente de aprobación. Fue un gusto ayudarte."]);
     }
 
     public function cancelRequest(ApiTester $I)

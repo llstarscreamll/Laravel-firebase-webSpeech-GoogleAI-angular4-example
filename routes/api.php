@@ -107,7 +107,18 @@ Route::post('/ai', function(Request $request) {
 					break;
 			}
 			break;
-		
+
+		case 'action.select-request-to-approve':
+			$requestName = $parameters['request-name'];
+			$selectedIndex = (int) $parameters['selected'] - 1;
+			$requestsFound = $requestService->searchByName($requestName);
+			$requestIdToApprove = array_keys($requestsFound)[$selectedIndex];
+			$requestService->approveRequest($requestIdToApprove);
+			$name = $requestsFound[array_keys($requestsFound)[$selectedIndex]]['name'];
+
+			$speech = 'La solicitud "'. $name .'" fue aprovada correctamente.';
+			break;
+
 		default:
 			$speech = 'Parece que ha ocurrido un error en la API';
 			break;
