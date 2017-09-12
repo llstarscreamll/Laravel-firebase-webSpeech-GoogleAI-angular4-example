@@ -37,18 +37,6 @@ Route::post('/ai', function(Request $request) {
 
 	switch ($action) {
 
-		case 'action.finish-request':
-			$requestId = $parameters['request_id'];
-			$requestService->finish($requestId);
-			$speech = "Solicitud finalizada, ahora está pendiente de aprobación. Eso es todo, fue un gusto ayudarte.";
-			break;
-
-		case 'action.cancel-request':
-			$requestId = $parameters['request_id'];
-			$requestService->cancel($requestId);
-			$speech = "Se ha cancelado tu solicitud. Fue un gusto asistirte.";
-			break;
-
 		case 'action.add-item-to-request':
 			// the speech request id should be appended on the msg
 			$requestId = $parameters['request_id'];
@@ -72,7 +60,6 @@ Route::post('/ai', function(Request $request) {
 				$speech = "He encontrado {$count} coincidencias de $itemName. Por favor sé mas específico...";
 				$requestService->addItemsSuggestionsToRequest($requestId, $itemName);
 			}
-
 			break;
 
 		case 'action.create-request':
@@ -85,6 +72,39 @@ Route::post('/ai', function(Request $request) {
 				'lifespan' => 5,
 				'parameters' => [ 'request_id' => $newRequest->getKey() ]
 			];
+			break;
+
+		case 'action.finish-request':
+			$requestId = $parameters['request_id'];
+			$requestService->finish($requestId);
+			$speech = "Solicitud finalizada, ahora está pendiente de aprobación. Fue un gusto ayudarte.";
+			break;
+
+		case 'action.cancel-request':
+			$requestId = $parameters['request_id'];
+			$requestService->cancel($requestId);
+			$speech = "Se ha cancelado tu solicitud. Fue un gusto asistirte.";
+			break;
+
+		case 'action.approve-request':
+			$requestName = $parameters['request-name'];
+			$requestsFound = $requestService->searchByName($requestName);
+			
+			switch (count($requestsFound)) {
+				case 0:
+					$speech = "No encontré solicitud con ese nombre, intenta otro.";
+					break;
+
+				case 1:
+					$approvedRequest = $requestService->approveRequest(array_keys($requestsFound)[0]);
+					$speech = 'Solicitud "'.$approvedRequest['name'].'" aprovada correctamente. Ya no te ayudo mas... Ve y llena los formularios.';
+					break;
+				
+				default:
+					$speech = "Encontré ". count($requestsFound) . " coincidencias. ¿Cual deseas aprobar?";
+					$data['matches'] = $requestsFound;
+					break;
+			}
 			break;
 		
 		default:

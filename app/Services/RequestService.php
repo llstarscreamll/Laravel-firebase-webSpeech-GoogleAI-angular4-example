@@ -34,6 +34,12 @@ class RequestService
 		    ->getValue();
 	}
 
+	public function approveRequest(string $id)
+	{
+		return $this->database->getReference($this->node. '/' .$id. '/status')
+			->set('approved');
+	}
+
 	public function addItemsSuggestionsToRequest($speechRequestId, $itemName)
 	{
 		// search items based on the given name

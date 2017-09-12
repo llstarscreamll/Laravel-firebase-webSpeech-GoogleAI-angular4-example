@@ -25,6 +25,34 @@ class AiCest
         $this->itemsService->deleteAll();
     }
 
+    public function searchRequestsToApprove(ApiTester $I)
+    {
+        $speechRequest1 = $this->requestService->createByName('Foo 1');
+        $speechRequest2 = $this->requestService->createByName('Foo 2');
+
+        $I->sendPost('api/ai', [
+            'result' => [
+                'resolvedQuery' => 'aprobar solicitud Foo',
+                'action' => 'action.approve-request',
+                'parameters' => [
+                    "request-name" => "Foo",
+                ],
+                'metadata' => [
+                  'intentName' => 'aprobar-solicitud',
+                ]
+            ],
+        ]);
+
+        $I->seeResponseCodeIs(200);
+        $I->seeResponseContainsJson(['speech' => "Encontré 2 coincidencias. ¿Cual deseas aprobar?"]);
+        $I->seeResponseContainsJson(['data' => [
+            'matches' => [
+                $speechRequest1->getKey() => $speechRequest1->getValue(),
+                $speechRequest2->getKey() => $speechRequest2->getValue(),
+            ],
+        ]]);
+    }
+/*
     public function finishRequest(ApiTester $I)
     {
         $speechRequestName = 'speech request testing';
@@ -200,5 +228,5 @@ class AiCest
         $I->seeResponseCodeIs(200);
         $I->seeResponseContainsJson(['speech' => "No encontré coincidencias del artículo foo item"]);
     }
-
+*/
 }
