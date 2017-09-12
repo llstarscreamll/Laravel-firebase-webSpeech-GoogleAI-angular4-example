@@ -97,7 +97,8 @@ Route::post('/ai', function(Request $request) {
 
 				case 1:
 					$approvedRequest = $requestService->approveRequest(array_keys($requestsFound)[0]);
-					$speech = 'Solicitud "'.$approvedRequest['name'].'" aprovada correctamente. Ya no te ayudo mas... Ve y llena los formularios.';
+					$name = $requestsFound[array_keys($requestsFound)[0]]['name'];
+					$speech = 'Solicitud "'. $name .'" aprovada correctamente. Ya no te ayudo mas... Ve y llena los formularios.';
 					break;
 				
 				default:
