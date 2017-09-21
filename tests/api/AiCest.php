@@ -25,7 +25,6 @@ class AiCest
         $this->itemsService->deleteAll();
     }
 
-/*
     public function approveSpecificRequestFromGivenList(ApiTester $I)
     {
         $speechRequest1 = $this->requestService->createByName('Foo request 01');
@@ -89,7 +88,7 @@ class AiCest
         $I->seeResponseCodeIs(200);
         $I->seeResponseContainsJson(['speech' => "No encontré solicitud con ese nombre, intenta otro."]);
     }
-    */
+
     public function searchRequestsToApprove(ApiTester $I)
     {
         $speechRequest1 = $this->requestService->createByName('Foo 1');
@@ -117,7 +116,7 @@ class AiCest
             ],
         ]]);
     }
-/*
+
     public function finishRequest(ApiTester $I)
     {
         $speechRequestName = 'speech request testing';
@@ -293,5 +292,4 @@ class AiCest
         $I->seeResponseCodeIs(200);
         $I->seeResponseContainsJson(['speech' => "No encontré coincidencias del artículo foo item"]);
     }
-*/
 }
